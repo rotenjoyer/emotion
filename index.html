@@ -118,14 +118,14 @@
 
         // Emotion detection logic (based on facial features)
         function detectEmotion(landmarks) {
-            let emotion = "Neutral 😐";
+            let emotion = "Neutral 😐"; // Default emotion
             let smile = landmarks[48].x - landmarks[54].x;
             let mouthOpen = landmarks[13].y - landmarks[14].y;
             let browRaise = landmarks[10].y - landmarks[151].y;
             let eyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y); // Eye openness measurement
 
             // Detect emotions based on facial features
-            if (smile > 0.02) {
+            if (smile > 0.05) { // Adjust smile threshold for more defined smile detection
                 emotion = "Happy 😊";
             } else if (browRaise > 0.03) {
                 emotion = "Surprised 😲";
