@@ -5,34 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emotion Detection</title>
     <style>
-        canvas {
+        #video {
+            width: 100%;
+            height: auto;
+        }
+        #canvas {
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: auto;
         }
         #emotion {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 24px;
-            color: white;
+            font-size: 30px;
             font-weight: bold;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <video id="video" autoplay playsinline style="display:none;"></video>
+    <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
-    <div id="emotion">Detecting...</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.1"></script>
+    <div id="emotion">Loading...</div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const emotionText = document.getElementById('emotion');
 
-        // Start camera with error handling
+        // Start webcam
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -42,9 +49,9 @@
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                 });
-            } catch (error) {
-                console.error("Error accessing webcam: ", error);
-                alert("Error accessing the webcam. Please check your camera permissions.");
+            } catch (err) {
+                console.error('Error accessing webcam: ', err);
+                emotionText.innerText = 'Error: Cannot access webcam';
             }
         }
 
@@ -74,7 +81,7 @@
             }
         }
 
-        // Draw face landmarks
+        // Draw face landmarks & connect key points
         function drawLandmarks(landmarks) {
             ctx.strokeStyle = "lime"; // Make the lines visible (neon green)
             ctx.lineWidth = 3; // Increase thickness for visibility
@@ -111,20 +118,24 @@
 
         // Emotion detection logic (based on facial features)
         function detectEmotion(landmarks) {
+            let emotion = "Neutral 😐";
+            let smile = landmarks[48].x - landmarks[54].x;
             let mouthOpen = landmarks[13].y - landmarks[14].y;
             let browRaise = landmarks[10].y - landmarks[151].y;
-            let smile = landmarks[48].x - landmarks[54].x;
 
-            let emotion = "Neutral 😐";
-
-            // Reduced emotion categories
-            if (smile > 0.02) emotion = "Happy 😊";
-            else if (browRaise > 0.03) emotion = "Surprised 😲";
-            else if (mouthOpen > 0.05) emotion = "Shocked 😱";
-            else if (browRaise < -0.02) emotion = "Angry 😡";
-            else if (smile > 0.03) emotion = "Excited 🤩";
-            else if (smile < -0.02 && browRaise < -0.03) emotion = "Sad 😢";
-            else if (smile < -0.02 && mouthOpen < 0.02) emotion = "Disappointed 😞";
+            if (smile > 0.02) {
+                emotion = "Happy 😊";
+            } else if (browRaise > 0.03) {
+                emotion = "Surprised 😲";
+            } else if (mouthOpen > 0.05) {
+                emotion = "Shocked 😱";
+            } else if (browRaise < -0.02) {
+                emotion = "Angry 😡";
+            } else if (smile < -0.02) {
+                emotion = "Sad 😢"; // Added Sad Emotion
+            } else if (smile < 0.01 && browRaise > 0.01 && mouthOpen < 0.02) {
+                emotion = "Nervous 😬"; // Added Nervous Emotion
+            }
 
             emotionText.innerText = emotion;
         }
@@ -140,3 +151,4 @@
     </script>
 </body>
 </html>
+
