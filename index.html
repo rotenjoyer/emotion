@@ -122,7 +122,9 @@
             let smile = landmarks[48].x - landmarks[54].x;
             let mouthOpen = landmarks[13].y - landmarks[14].y;
             let browRaise = landmarks[10].y - landmarks[151].y;
+            let eyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y); // Eye openness measurement
 
+            // Detect emotions based on facial features
             if (smile > 0.02) {
                 emotion = "Happy 😊";
             } else if (browRaise > 0.03) {
@@ -132,9 +134,9 @@
             } else if (browRaise < -0.02) {
                 emotion = "Angry 😡";
             } else if (smile < -0.02) {
-                emotion = "Sad 😢"; // Added Sad Emotion
+                emotion = "Sad 😢"; // Sad Emotion
             } else if (smile < 0.01 && browRaise > 0.01 && mouthOpen < 0.02) {
-                emotion = "Nervous 😬"; // Added Nervous Emotion
+                emotion = "Nervous 😬"; // Nervous Emotion
             }
 
             emotionText.innerText = emotion;
@@ -151,4 +153,3 @@
     </script>
 </body>
 </html>
-
